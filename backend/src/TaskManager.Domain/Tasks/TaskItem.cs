@@ -34,6 +34,8 @@ public sealed class TaskItem : Aggregate
             throw new DomainException("Title is required.");
         if (title.Length > 200)
             throw new DomainException("Title cannot exceed 200 characters.");
+        if (dueDate.HasValue && dueDate.Value.Date < DateTime.UtcNow.Date)
+            throw new DomainException("Due date cannot be in the past.");
 
         return new TaskItem(Guid.NewGuid(), title, description, priority, dueDate, userId);
     }
@@ -44,6 +46,8 @@ public sealed class TaskItem : Aggregate
             throw new DomainException("Title is required.");
         if (title.Length > 200)
             throw new DomainException("Title cannot exceed 200 characters.");
+        if (dueDate.HasValue && dueDate.Value.Date < DateTime.UtcNow.Date)
+            throw new DomainException("Due date cannot be in the past.");
 
         Title = title;
         Description = description;
@@ -75,18 +79,6 @@ public sealed class TaskItem : Aggregate
 
     public void ChangeStatus(TaskStatus newStatus)
     {
-        var valid = (Status, newStatus) switch
-        {
-            (TaskStatus.Todo, TaskStatus.InProgress) => true,
-            (TaskStatus.InProgress, TaskStatus.Done)  => true,
-            (TaskStatus.InProgress, TaskStatus.Todo)  => true,
-            (TaskStatus.Done, TaskStatus.InProgress)  => true,
-            _ => false
-        };
-
-        if (!valid)
-            throw new DomainException($"Cannot transition from {Status} to {newStatus}.");
-
         Status = newStatus;
         IsCompleted = newStatus == TaskStatus.Done;
         Touch();

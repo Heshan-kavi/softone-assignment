@@ -5,8 +5,8 @@ namespace TaskManager.Application.Interfaces;
 
 public interface ITaskRepository
 {
-    Task<IReadOnlyList<TaskItem>> ListAsync(DomainTaskStatus? status, string? sortBy, string? sortOrder, CancellationToken ct = default);
-    Task<TaskItem?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<IReadOnlyList<TaskItem>> ListAsync(Guid userId, DomainTaskStatus? status, string? sortBy, string? sortOrder, CancellationToken ct = default);
+    Task<TaskItem?> GetByIdAsync(Guid id, Guid userId, CancellationToken ct = default);
     void Add(TaskItem task);
     void Remove(TaskItem task);
 }

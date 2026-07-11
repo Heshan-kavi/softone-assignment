@@ -38,9 +38,10 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+var corsOrigins = builder.Configuration.GetSection("CorsOrigins").Get<string[]>() ?? [];
 builder.Services.AddCors(o =>
     o.AddPolicy("AllowAngular", p =>
-        p.WithOrigins("http://localhost:4200", "http://localhost:4201")
+        p.WithOrigins(corsOrigins)
          .AllowAnyHeader()
          .AllowAnyMethod()));
 
@@ -50,7 +51,9 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
-    await DbSeeder.SeedAsync(db, hasher);
+    var adminUsername = app.Configuration["Seeder:AdminUsername"]!;
+    var adminPassword = app.Configuration["Seeder:AdminPassword"]!;
+    await DbSeeder.SeedAsync(db, hasher, adminUsername, adminPassword);
 }
 
 if (app.Environment.IsDevelopment())

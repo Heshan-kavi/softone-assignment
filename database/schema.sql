@@ -2,6 +2,9 @@
 -- TaskManagerDb - Database Schema (Guid IDs)
 -- ============================================================
 
+USE master;
+GO
+
 -- Drop and recreate to apply schema changes
 IF EXISTS (SELECT name FROM sys.databases WHERE name = 'TaskManagerDb')
 BEGIN
@@ -50,25 +53,7 @@ CREATE TABLE Tasks (
 GO
 
 -- ============================================================
--- Seed: Default admin user
--- Username : admin
--- Password : admin123  (BCrypt hash, work factor 11)
--- ============================================================
-IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = 'admin')
-BEGIN
-    INSERT INTO Users (Id, Username, PasswordHash, CreatedAt, UpdatedAt)
-    VALUES (
-        NEWID(),
-        'admin',
-        '$2a$11$zE5gGiVlMiHi9G3PQO5eGOBqIiHCzK5.PkiIVu/9EF4uWZ1T1GnAS',
-        GETUTCDATE(),
-        GETUTCDATE()
-    );
-END
-GO
-
--- ============================================================
--- Note: The application also seeds the admin user automatically
--- via DbSeeder on first startup if no users exist.
--- Running this script is sufficient to set up a complete DB.
+-- Note: The admin user (admin / admin123) is seeded automatically
+-- by the application (DbSeeder) on first startup.
+-- Run the backend API once after this script to complete setup.
 -- ============================================================

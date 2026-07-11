@@ -14,7 +14,8 @@ public sealed class CurrentUserService : ICurrentUserService
         get
         {
             var value = _accessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return Guid.TryParse(value, out var id) ? id : Guid.Empty;
+            if (Guid.TryParse(value, out var id)) return id;
+            throw new UnauthorizedAccessException("Authenticated user context is missing.");
         }
     }
 }

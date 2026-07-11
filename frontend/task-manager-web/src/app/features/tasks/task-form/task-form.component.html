@@ -1,0 +1,66 @@
+<aside class="form-pane">
+  <div class="pane-header">
+    <div>
+      <h2>{{ selectedTask() ? 'Edit task' : 'Add task' }}</h2>
+      <p>{{ selectedTask() ? 'Update the selected task.' : 'Create a new task.' }}</p>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <label>
+      <span>Title</span>
+      <input type="text" formControlName="title" placeholder="Prepare interview demo" />
+      @if (form.controls.title.touched && form.controls.title.invalid) {
+        <small>Title is required and must be under 200 characters.</small>
+      }
+    </label>
+
+    <label>
+      <span>Description</span>
+      <textarea rows="5" formControlName="description" placeholder="Add useful context"></textarea>
+    </label>
+
+    <div class="form-grid">
+      <label>
+        <span>Priority</span>
+        <select formControlName="priority">
+          @for (p of priorities; track p.value) {
+            <option [ngValue]="p.value">{{ p.label }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        <span>Due date</span>
+        <input type="date" formControlName="dueDate" [min]="today" />
+        @if (form.controls.dueDate.touched && form.controls.dueDate.hasError('pastDate')) {
+          <small>Due date cannot be in the past.</small>
+        }
+      </label>
+    </div>
+
+    @if (selectedTask()) {
+      <label>
+        <span>Status</span>
+        <div class="segmented-control">
+          @for (s of statuses; track s.value) {
+            <button
+              type="button"
+              [class.active]="selectedTask()?.status === s.value"
+              [disabled]="s.value < (selectedTask()?.status ?? 0)"
+              (click)="setStatus(s.value)"
+            >
+              {{ s.label }}
+            </button>
+          }
+        </div>
+      </label>
+    }
+
+    <div class="form-actions">
+      <button type="button" class="ghost-button" (click)="clear.emit()">Clear</button>
+      <button type="submit" class="primary-button" [disabled]="isSaving()">
+        {{ isSaving() ? 'Saving...' : selectedTask() ? 'Update task' : 'Create task' }}
+      </button>
+    </div>
+  </form>
+</aside>

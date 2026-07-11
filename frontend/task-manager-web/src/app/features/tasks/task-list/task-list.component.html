@@ -1,0 +1,84 @@
+<div class="list-pane">
+  <div class="pane-header">
+    <div>
+      <h2>Task list</h2>
+      <p>{{ filteredTasks().length }} visible</p>
+    </div>
+    <button type="button" class="primary-button compact" (click)="newTask.emit()">New</button>
+  </div>
+
+  <div class="filters">
+    <label class="search-field">
+      <span>Search</span>
+      <input type="search" placeholder="Title or description" (input)="updateSearch($any($event.target).value)" />
+    </label>
+    <label>
+      <span>Status</span>
+      <select (change)="updateStatusFilter($any($event.target).value)">
+        <option value="all">All</option>
+        @for (s of statuses; track s.value) {
+          <option [value]="s.value">{{ s.label }}</option>
+        }
+      </select>
+    </label>
+    <label>
+      <span>Priority</span>
+      <select (change)="updatePriorityFilter($any($event.target).value)">
+        <option value="all">All</option>
+        @for (p of priorities; track p.value) {
+          <option [value]="p.value">{{ p.label }}</option>
+        }
+      </select>
+    </label>
+    <label>
+      <span>Sort</span>
+      <select (change)="updateSortField($any($event.target).value)">
+        <option value="createdAt">Created</option>
+        <option value="dueDate">Due date</option>
+        <option value="title">Title</option>
+        <option value="priority">Priority</option>
+        <option value="status">Status</option>
+      </select>
+    </label>
+    <button type="button" class="icon-button" (click)="toggleSortDirection()" [attr.aria-label]="'Sort ' + sortDirection()">
+      {{ sortDirection() === 'asc' ? 'Asc' : 'Desc' }}
+    </button>
+  </div>
+
+  @if (filteredTasks().length === 0) {
+    <div class="empty-state">No tasks match the current filters.</div>
+  } @else {
+    <div class="task-list">
+      @for (task of filteredTasks(); track task.id) {
+        <article
+          class="task-row"
+          [class.selected]="selectedTaskId() === task.id"
+          [class.done]="task.status === TaskStatus.Done || task.isCompleted"
+          (click)="taskSelect.emit(task)"
+        >
+          <div class="task-main">
+            <h3>{{ task.title }}</h3>
+            <p>{{ task.description || 'No description' }}</p>
+            <div class="meta">
+              <span class="pill priority-{{ priorityLabel(task.priority).toLowerCase() }}">
+                {{ priorityLabel(task.priority) }}
+              </span>
+              <span class="pill">{{ statusLabel(task.status) }}</span>
+              @if (task.dueDate) {
+                <span>Due {{ task.dueDate | date: 'mediumDate' }}</span>
+              }
+            </div>
+          </div>
+          <div class="row-actions" (click)="$event.stopPropagation()">
+            <button type="button"
+              (click)="taskComplete.emit(task)"
+              [disabled]="task.status === TaskStatus.Done || task.isCompleted">
+              Done
+            </button>
+            <button type="button" class="danger-text" (click)="taskDelete.emit(task)">Delete</button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</div>

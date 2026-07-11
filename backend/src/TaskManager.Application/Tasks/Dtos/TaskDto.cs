@@ -1,11 +1,13 @@
+using TaskManager.Domain.Tasks;
+
 namespace TaskManager.Application.Tasks.Dtos;
 
 public sealed record TaskDto(
     Guid Id,
     string Title,
     string? Description,
-    string Priority,
-    string Status,
+    TaskPriority Priority,
+    Domain.Tasks.TaskStatus Status,
     bool IsCompleted,
     DateTime? DueDate,
     DateTime CreatedAt,

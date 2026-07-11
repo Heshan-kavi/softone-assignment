@@ -15,10 +15,11 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
     {
         var (status, title, detail) = exception switch
         {
-            ValidationException ve  => (400, "Validation Error", string.Join("; ", ve.Errors.Select(e => e.ErrorMessage))),
-            DomainException de      => (400, "Domain Error", de.Message),
-            NotFoundException nfe   => (404, "Not Found", nfe.Message),
-            _                       => (500, "Server Error", "An unexpected error occurred.")
+            ValidationException ve          => (400, "Validation Error", string.Join("; ", ve.Errors.Select(e => e.ErrorMessage))),
+            DomainException de              => (400, "Domain Error", de.Message),
+            NotFoundException nfe           => (404, "Not Found", nfe.Message),
+            UnauthorizedAccessException uae => (401, "Unauthorized", uae.Message),
+            _                               => (500, "Server Error", "An unexpected error occurred.")
         };
 
         if (status == 500)

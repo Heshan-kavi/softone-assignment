@@ -11,9 +11,9 @@ public sealed class TaskRepository : ITaskRepository
 
     public TaskRepository(AppDbContext context) => _context = context;
 
-    public async Task<IReadOnlyList<TaskItem>> ListAsync(DomainTaskStatus? status, string? sortBy, string? sortOrder, CancellationToken ct = default)
+    public async Task<IReadOnlyList<TaskItem>> ListAsync(Guid userId, DomainTaskStatus? status, string? sortBy, string? sortOrder, CancellationToken ct = default)
     {
-        var query = _context.Tasks.AsQueryable();
+        var query = _context.Tasks.Where(t => t.UserId == userId);
 
         if (status.HasValue)
             query = query.Where(t => t.Status == status.Value);
@@ -32,8 +32,8 @@ public sealed class TaskRepository : ITaskRepository
         return await query.ToListAsync(ct);
     }
 
-    public async Task<TaskItem?> GetByIdAsync(Guid id, CancellationToken ct = default)
-        => await _context.Tasks.FindAsync([id], ct);
+    public async Task<TaskItem?> GetByIdAsync(Guid id, Guid userId, CancellationToken ct = default)
+        => await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId, ct);
 
     public void Add(TaskItem task) => _context.Tasks.Add(task);
 

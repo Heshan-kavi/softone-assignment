@@ -10,16 +10,18 @@ public sealed class UpdateTaskCommandHandler : IRequestHandler<UpdateTaskCommand
 {
     private readonly ITaskRepository _tasks;
     private readonly IUnitOfWork _uow;
+    private readonly ICurrentUserService _currentUser;
 
-    public UpdateTaskCommandHandler(ITaskRepository tasks, IUnitOfWork uow)
+    public UpdateTaskCommandHandler(ITaskRepository tasks, IUnitOfWork uow, ICurrentUserService currentUser)
     {
         _tasks = tasks;
         _uow = uow;
+        _currentUser = currentUser;
     }
 
     public async Task<TaskDto> Handle(UpdateTaskCommand request, CancellationToken cancellationToken)
     {
-        var task = await _tasks.GetByIdAsync(request.Id, cancellationToken)
+        var task = await _tasks.GetByIdAsync(request.Id, _currentUser.UserId, cancellationToken)
             ?? throw new NotFoundException($"Task {request.Id} not found.");
 
         task.UpdateDetails(request.Title, request.Description, request.Priority, request.DueDate);

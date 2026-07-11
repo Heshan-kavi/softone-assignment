@@ -1,0 +1,45 @@
+<main class="page-shell">
+
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Task workspace</p>
+      <h1>Manage tasks</h1>
+    </div>
+    <div class="session">
+      <span>{{ username() ?? 'admin' }}</span>
+      <button type="button" class="ghost-button" (click)="logout()">Logout</button>
+    </div>
+  </header>
+
+  @if (message()) {
+    <div class="toast success">{{ message() }}</div>
+  }
+  @if (error()) {
+    <div class="toast error">{{ error() }}</div>
+  }
+
+  <section class="stats-row" aria-label="Task summary">
+    <div><span>Total</span><strong>{{ completionSummary().total }}</strong></div>
+    <div><span>Completed</span><strong>{{ completionSummary().done }}</strong></div>
+    <div><span>Open</span><strong>{{ completionSummary().total - completionSummary().done }}</strong></div>
+  </section>
+
+  <section class="workspace">
+    <app-task-list
+      [tasks]="tasks()"
+      [selectedTaskId]="selectedTask()?.id ?? null"
+      (taskSelect)="onTaskSelect($event)"
+      (taskComplete)="onTaskComplete($event)"
+      (taskDelete)="onTaskDelete($event)"
+      (newTask)="onNewTask()"
+    />
+    <app-task-form
+      [selectedTask]="selectedTask()"
+      [isSaving]="isSaving()"
+      (save)="onSave($event)"
+      (statusChange)="onStatusChange($event)"
+      (clear)="onClear()"
+    />
+  </section>
+
+</main>
